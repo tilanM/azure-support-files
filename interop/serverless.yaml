@@ -1,0 +1,41 @@
+service: cirrent-interop
+
+custom:
+  # Our stage is based on what is passed in when running serverless
+  # commands. Or falls back to what we have set in the provider section.
+  stage: ${opt:stage, 'offline'}
+  region: ${opt:region, 'us-west-2'}
+  bundle:
+    linting: false
+  serverless-offline:
+    httpPort: 4000
+    noPrependStageInUrl: true
+
+provider:
+  name: aws
+  runtime: nodejs14.x
+  memorySize: 512
+  timeout: 10
+  logRetentionInDays: 90
+  lambdaHashingVersion: 20201221 # https://www.serverless.com/framework/docs/deprecations/#LAMBDA_HASHING_VERSION_V2
+  logs:
+    httpApi: true
+  httpApi:
+    cors: true
+
+functions:
+  app:
+    handler: src/app.handler
+    events:
+      - httpApi:
+          path: "/interop"
+          method: "POST"
+      - httpApi:
+          path: "/"
+          method: "GET"
+
+package:
+  individually: true
+
+plugins:
+  - serverless-offline
