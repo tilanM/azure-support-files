@@ -7,7 +7,7 @@ import { got } from "got";
 import { createVerifier } from "fast-jwt";
 import fs from "fs";
 import cacheManager from "cache-manager";
-import { X509 } from "jsrsasign";
+import { X509, KJUR } from "jsrsasign";
 import Joi from "joi";
 import { audience, verifyCacheKey, isLocal, publicKeyURL } from "../vars.mjs";
 
@@ -59,6 +59,10 @@ async function getSerialNumber(certificate) {
   return serialNumber;
 }
 
+async function getThumbprint(certificate) {
+  return KJUR.crypto.Util.hashHex(certificate.hex, "sha256").toUpperCase();
+}
+
 async function getCertificate(certBuf) {
   const certString = certBuf.toString("ascii");
   let x509 = new X509();
@@ -67,4 +71,4 @@ async function getCertificate(certBuf) {
   return x509;
 }
 
-export { createTokenVerifier, getSerialNumber, getCertificate };
+export { createTokenVerifier, getSerialNumber, getCertificate, getThumbprint };

@@ -1,19 +1,13 @@
 import Joi from "joi";
-import {
-  IoTClient,
-  RegisterCertificateWithoutCACommand,
-  CreateThingCommand,
-  AttachThingPrincipalCommand,
-  DescribeEndpointCommand,
-  AttachPolicyCommand,
-  GetPolicyCommand,
-} from "@aws-sdk/client-iot";
+import iothub from "azure-iothub";
 
 import requestMiddleware from "../middleware/request.mjs";
-import { iotPolicy, baseTopic, thingNamePrefix } from "../vars.mjs";
-import { getSerialNumber, getCertificate } from "../helpers/crypto.mjs";
-
-const client = new IoTClient();
+import {
+  getSerialNumber,
+  getCertificate,
+  getThumbprint,
+} from "../helpers/crypto.mjs";
+import { baseTopic } from "../vars.mjs";
 
 const postInteropSchema = Joi.object().keys({
   action: Joi.string().valid("status", "provision", "message").required(),
@@ -67,15 +61,18 @@ async function message() {
 }
 
 async function provision(certs) {
+  const registry = iothub.Registry.fromConnectionString(process.env.IOT_CONN);
+
   let resp = [];
 
-  const endpoint = await getEndpoint();
-  const policy = await getPolicy();
+  const endpoint = iothub.ConnectionString.parse(process.env.IOT_CONN).HostName;
+  const policy = "1";
 
   for (const item of certs) {
     let certBuf;
     let cert;
     let serialNumber;
+    let thumbprint;
 
     try {
       certBuf = Buffer.from(item.cert, "base64");
@@ -91,6 +88,7 @@ async function provision(certs) {
 
     try {
       serialNumber = await getSerialNumber(cert);
+      console.log(serialNumber);
     } catch (err) {
       console.log("errserial:", err);
       resp.push({
@@ -103,11 +101,24 @@ async function provision(certs) {
     }
 
     try {
-      await createAndRegisterThing(
-        certBuf.toString("ascii"),
-        serialNumber,
-        policy
-      );
+      //register here
+      thumbprint = await getThumbprint(cert);
+      await registry.create({
+        deviceId: serialNumber,
+        status: "enabled",
+        authentication: {
+          x509Thumbprint: {
+            primaryThumbprint: thumbprint,
+            secondaryThumbprint: thumbprint,
+          },
+        },
+      });
+      // await client.certificates.createOrUpdate(
+      //   process.env.RG_ID,
+      //   process.env.HUB_ID,
+      //   serialNumber,
+      //   { properties: { certificate: certBuf.toString("ascii") } }
+      // );
 
       resp.push({
         ref: item.ref,
@@ -121,96 +132,13 @@ async function provision(certs) {
         ref: item.ref,
         status: "ERROR",
         message: "Failed creating and registering thing",
+        out: err
       });
       continue;
     }
   }
 
   return resp;
-}
-
-async function getEndpoint() {
-  let resp;
-
-  try {
-    const depCmd = new DescribeEndpointCommand({
-      endpointType: "iot:Data-ATS",
-    });
-
-    const depResp = await client.send(depCmd);
-    resp = depResp.endpointAddress;
-  } catch (err) {
-    resp = null;
-  }
-
-  return resp;
-}
-
-async function getPolicy() {
-  let resp = false;
-
-  try {
-    const policyCmd = new GetPolicyCommand({
-      policyName: iotPolicy,
-    });
-
-    const policyResp = await client.send(policyCmd);
-    if (policyResp.policyArn) resp = true;
-  } catch (err) {
-    resp = false;
-  }
-
-  return resp;
-}
-
-async function createAndRegisterThing(cert, serialNum, policy) {
-  let certArn;
-  try {
-    const regCmd = new RegisterCertificateWithoutCACommand({
-      certificatePem: cert,
-      status: "ACTIVE",
-    });
-
-    const regResp = await client.send(regCmd);
-
-    certArn = regResp.certificateArn;
-  } catch (err) {
-    if (err.name == "ResourceAlreadyExistsException") {
-      certArn = err.resourceArn;
-    } else {
-      throw err;
-    }
-  }
-
-  const thingCmd = new CreateThingCommand({
-    thingName: `${thingNamePrefix}${serialNum}`,
-    attributePayload: {
-      attributes: {
-        serialNumber: serialNum,
-      },
-      merge: true,
-    },
-  });
-
-  const thingResp = await client.send(thingCmd);
-
-  if (policy) {
-    const policyCmd = new AttachPolicyCommand({
-      policyName: iotPolicy,
-      target: certArn,
-    });
-
-    await client.send(policyCmd);
-  }
-
-  const principalCmd = new AttachThingPrincipalCommand({
-    thingName: thingResp.thingName,
-    principal: certArn,
-  });
-
-  await client.send(principalCmd);
-
-  return true;
 }
 
 export default requestMiddleware(post, {

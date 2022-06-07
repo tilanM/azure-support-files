@@ -18,7 +18,7 @@ app.get("/", (_, res) => res.sendStatus(httpStatus.OK));
 
 app.get("/auth", authMiddleware, (_, res) => res.sendStatus(httpStatus.OK));
 
-app.use("/interop", authMiddleware, interop);
+app.use("/interop", interop);
 
 app.use((err, _, res, next) => {
   if (res.headersSent) {
@@ -30,6 +30,10 @@ app.use((err, _, res, next) => {
   });
 });
 
-const handler = serverlessHttp(app);
+const handler = serverlessHttp(app, { provider: "azure" });
 
-export { handler, app };
+async function azureHandler(context, req) {
+  context.res = await handler(context, req);
+}
+
+export { azureHandler, app };

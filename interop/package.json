@@ -2,34 +2,41 @@
   "name": "interop",
   "version": "1.0.0",
   "description": "",
-  "main": "app.mjs",
+  "main": "index.js",
   "scripts": {
-    "dev": "npx cross-env AUDIENCE=TestAWSAccount cross-env NODE_ENV=development cross-env IS_LOCAL=1 sls offline start --ignoreJWTSignature --stage offline",
-    "test": "npx cross-env AUDIENCE=TestAWSAccount cross-env IS_LOCAL=1 cross-env NODE_OPTIONS=--experimental-vm-modules jest -i --coverage --colors --verbose",
-    "test2": "npx cross-env AUDIENCE=TestAWSAccount cross-env IS_LOCAL=1 cross-env NODE_OPTIONS=--experimental-vm-modules jest -i --coverage --colors"
+    "test": "npx cross-env AUDIENCE=TestAzureAccount cross-env IS_LOCAL=1 cross-env NODE_OPTIONS=--experimental-vm-modules jest -i --coverage --colors --verbose"
   },
-  "type": "module",
   "license": "ISC",
   "dependencies": {
-    "@aws-sdk/client-iot": "^3.39.0",
-    "cache-manager": "^3.4.4",
+    "azure-iothub": "^1.15.0",
+    "cache-manager": "^4.0.0",
     "compression": "^1.7.4",
-    "express": "^4.17.1",
-    "fast-jwt": "^1.3.0",
-    "got": "^12.0.1",
-    "helmet": "^5.0.1",
-    "http-status": "^1.5.0",
-    "joi": "^17.4.2",
-    "jsrsasign": "^10.5.0",
-    "serverless-http": "^3.0.1"
+    "express": "^4.18.1",
+    "fast-jwt": "^1.5.4",
+    "got": "^12.0.4",
+    "helmet": "^5.0.2",
+    "http-status": "^1.5.2",
+    "joi": "^17.6.0",
+    "jsrsasign": "^10.5.20",
+    "serverless-http": "https://github.com/curtdept/serverless-http.git#master"
   },
   "devDependencies": {
-    "aws-sdk-client-mock": "^0.6.0",
     "cross-env": "^7.0.3",
-    "eslint": "^8.1.0",
-    "jest": "^28.0.0",
-    "prettier": "^2.5.0",
-    "serverless-offline": "^8.2.0",
-    "supertest": "^6.1.6"
+    "eslint": "^8.15.0",
+    "jest": "^28.1.0",
+    "prettier": "^2.6.2",
+    "supertest": "^6.2.3"
+  },
+  "jest": {
+    "moduleFileExtensions": [
+      "js",
+      "mjs"
+    ],
+    "testMatch": [
+      "**/__tests__/**/*.js?(x)",
+      "**/?(*.)(spec|test).js?(x)",
+      "**/__tests__/**/*.mjs",
+      "**/?(*.)(spec|test).mjs"
+    ]
   }
 }
