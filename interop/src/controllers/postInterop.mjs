@@ -101,7 +101,6 @@ async function provision(certs) {
     }
 
     try {
-      //register here
       thumbprint = await getThumbprint(cert);
       await registry.create({
         deviceId: serialNumber,
@@ -113,12 +112,6 @@ async function provision(certs) {
           },
         },
       });
-      // await client.certificates.createOrUpdate(
-      //   process.env.RG_ID,
-      //   process.env.HUB_ID,
-      //   serialNumber,
-      //   { properties: { certificate: certBuf.toString("ascii") } }
-      // );
 
       resp.push({
         ref: item.ref,

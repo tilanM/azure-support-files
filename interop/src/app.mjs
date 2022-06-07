@@ -18,7 +18,7 @@ app.get("/", (_, res) => res.sendStatus(httpStatus.OK));
 
 app.get("/auth", authMiddleware, (_, res) => res.sendStatus(httpStatus.OK));
 
-app.use("/interop", interop);
+app.use("/interop", authMiddleware, interop);
 
 app.use((err, _, res, next) => {
   if (res.headersSent) {
