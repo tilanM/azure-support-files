@@ -87,7 +87,7 @@
             },
             {
               "name": "AUDIENCE",
-              "value": "AzureAccount"
+              "value": "[subscription().subscriptionId]"
             }
           ]
         }
