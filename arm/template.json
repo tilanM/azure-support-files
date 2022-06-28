@@ -121,6 +121,10 @@
     "interopURL": {
       "type": "string",
       "value": "[concat('https://', reference(resourceId('Microsoft.Web/sites/', variables('functionAppName')), '2018-02-01').defaultHostName, '/interop')]"
+    },
+    "subscriptionId": {
+      "type": "string",
+      "value": "[subscription().subscriptionId]"
     }
   }
 }
