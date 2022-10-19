@@ -1,13 +1,26 @@
 import httpStatus from "http-status";
 import request from "supertest";
+import HttpRequestMock from "http-request-mock";
+import fs from "fs";
 
 import { app } from "../src/app.mjs";
 import { genToken, genExpiredToken } from "./helpers/genToken.mjs";
+import { publicKeyURL } from "../src/vars.mjs";
 
 const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
+const mocker = HttpRequestMock.setup();
+
 describe("Check auth is functional", () => {
   describe("GET /auth basic tests", () => {
+    beforeEach(async () => {
+      mocker.reset();
+      mocker.mock({
+        url: publicKeyURL,
+        method: "GET",
+        body: fs.readFileSync("./tests/cert/test-public.key"),
+      });
+    });
     test(`should return ${httpStatus.UNAUTHORIZED} without an authorization header`, async () => {
       const res = await request(app).get("/auth").send();
 

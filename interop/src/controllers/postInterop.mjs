@@ -6,6 +6,7 @@ import {
   getSerialNumber,
   getCertificate,
   getThumbprint,
+  isValidExpiration,
 } from "../helpers/crypto.mjs";
 import { baseTopic } from "../vars.mjs";
 
@@ -64,9 +65,15 @@ async function provision(certs) {
   const registry = iothub.Registry.fromConnectionString(process.env.IOT_CONN);
 
   let resp = [];
+  let endpoint;
 
-  const endpoint = iothub.ConnectionString.parse(process.env.IOT_CONN).HostName;
-  const policy = "1";
+  try {
+    endpoint = iothub.ConnectionString.parse(process.env.IOT_CONN).HostName;
+  } catch (err) {
+    endpoint = null;
+  }
+
+  const policy = true;
 
   for (const item of certs) {
     let certBuf;
@@ -88,7 +95,6 @@ async function provision(certs) {
 
     try {
       serialNumber = await getSerialNumber(cert);
-      console.log(serialNumber);
     } catch (err) {
       console.log("errserial:", err);
       resp.push({
@@ -96,6 +102,27 @@ async function provision(certs) {
         status: "ERROR",
         message:
           "Certificate serial cannot be decoded or is incorrect (only alphanumeric/hyphen/underscore)",
+      });
+      continue;
+    }
+
+    try {
+      const isValid = await isValidExpiration(cert);
+
+      if (!isValid) {
+        resp.push({
+          ref: item.ref,
+          status: "ERROR",
+          message: "Certificate notBefore or notAfter is out of range",
+        });
+        continue;
+      }
+    } catch (err) {
+      console.log("errexpiration:", err);
+      resp.push({
+        ref: item.ref,
+        status: "ERROR",
+        message: "Certificate expiration cannot be decoded",
       });
       continue;
     }
@@ -125,7 +152,6 @@ async function provision(certs) {
         ref: item.ref,
         status: "ERROR",
         message: "Failed creating and registering thing",
-        out: err
       });
       continue;
     }

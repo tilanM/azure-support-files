@@ -5,36 +5,36 @@
 
 import { got } from "got";
 import { createVerifier } from "fast-jwt";
-import fs from "fs";
-import cacheManager from "cache-manager";
-import { X509, KJUR } from "jsrsasign";
+import { caching, memoryStore } from "cache-manager";
+import { X509, zulutodate, KJUR } from "jsrsasign";
 import Joi from "joi";
-import { audience, verifyCacheKey, isLocal, publicKeyURL } from "../vars.mjs";
+import { audience, verifyCacheKey, publicKeyURL } from "../vars.mjs";
 
-const cache = cacheManager.caching({
-  store: "memory",
-  max: 10,
-  ttl: 600 /*seconds*/,
-});
+let cache;
 
 /**
  * Create token verifier function
  * @returns {function} token verify function
  */
 async function createTokenVerifier() {
+  if (!cache) {
+    cache = await caching(
+      memoryStore({
+        max: 10,
+        ttl: 600 /* seconds */,
+      })
+    );
+  }
+
   let cacheRes = await cache.get(verifyCacheKey);
   if (cacheRes) return cacheRes;
 
   let publicKey;
 
-  if (isLocal) {
-    publicKey = fs.readFileSync("./tests/cert/test-public.key");
-  } else {
-    const dl = await got(publicKeyURL);
+  const dl = await got(publicKeyURL);
 
-    if (dl.rawBody) {
-      publicKey = dl.rawBody;
-    }
+  if (dl.rawBody) {
+    publicKey = dl.rawBody;
   }
 
   if (publicKey && audience) {
@@ -59,8 +59,16 @@ async function getSerialNumber(certificate) {
   return serialNumber;
 }
 
-async function getThumbprint(certificate) {
-  return KJUR.crypto.Util.hashHex(certificate.hex, "sha256").toUpperCase();
+async function isValidExpiration(certificate) {
+  let isValid = false;
+
+  const notBefore = zulutodate(certificate.getNotBefore());
+  const notAfter = zulutodate(certificate.getNotAfter());
+  const cDate = new Date();
+
+  if (cDate >= notBefore && cDate <= notAfter) isValid = true;
+
+  return isValid;
 }
 
 async function getCertificate(certBuf) {
@@ -71,4 +79,14 @@ async function getCertificate(certBuf) {
   return x509;
 }
 
-export { createTokenVerifier, getSerialNumber, getCertificate, getThumbprint };
+async function getThumbprint(certificate) {
+  return KJUR.crypto.Util.hashHex(certificate.hex, "sha256").toUpperCase();
+}
+
+export {
+  createTokenVerifier,
+  getSerialNumber,
+  getCertificate,
+  isValidExpiration,
+  getThumbprint,
+};
