@@ -5,7 +5,7 @@
     "seed": "[uniqueString(subscription().subscriptionId)]",
     "hostingPlanName": "[concat(resourceGroup().name, '-plan-', uniqueString(variables('seed')))]",
     "iotHubName": "[concat(resourceGroup().name, '-hub-', uniqueString(variables('seed')))]",
-    "storageAccountName": "[uniqueString(variables('seed'))]",
+    "storageAccountName": "[uniqueString(variables(concat(resourceGroup().name, 'seed')))]",
     "functionAppName": "[concat(resourceGroup().name, '-iop-', uniqueString(variables('seed')))]"
   },
   "resources": [
