@@ -1,5 +1,6 @@
 import Joi from "joi";
 import iothub from "azure-iothub";
+import iotcommon from "azure-iot-common";
 
 import requestMiddleware from "../middleware/request.mjs";
 import {
@@ -127,6 +128,16 @@ async function provision(certs) {
       continue;
     }
 
+    // try{
+    //   const getDevInfo = util.promisify(registry.get);
+    //   const a = await getDevInfo(serialNumber);
+    //   console.log('e1', a);
+    // }
+    // catch(err)
+    // {
+    //   console.log('e2', err);
+    // }
+
     try {
       thumbprint = await getThumbprint(cert);
       await registry.create({
@@ -148,11 +159,21 @@ async function provision(certs) {
         policyApplied: policy,
       });
     } catch (err) {
-      resp.push({
-        ref: item.ref,
-        status: "ERROR",
-        message: "Failed creating and registering thing",
-      });
+      if (err instanceof iotcommon.errors.DeviceAlreadyExistsError) {
+        resp.push({
+          ref: item.ref,
+          status: "SUCCESS",
+          endpoint: endpoint,
+          topic: baseTopic,
+          policyApplied: policy,
+        });
+      } else {
+        resp.push({
+          ref: item.ref,
+          status: "ERROR",
+          message: "Failed creating and registering thing",
+        });
+      }
       continue;
     }
   }
