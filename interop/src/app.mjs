@@ -1,6 +1,4 @@
-import compression from "compression";
 import express from "express";
-import helmet from "helmet";
 import httpStatus from "http-status";
 import serverlessHttp from "serverless-http";
 
@@ -8,11 +6,7 @@ import interop from "./routes/interop.mjs";
 import { authMiddleware } from "./middleware/auth.mjs";
 
 const app = express();
-const comp = compression();
-
-app.use(comp);
 app.use(express.json());
-app.use(helmet());
 
 app.get("/", (_, res) => res.sendStatus(httpStatus.OK));
 
