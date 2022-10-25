@@ -6,7 +6,7 @@ import interop from "./routes/interop.mjs";
 import { authMiddleware } from "./middleware/auth.mjs";
 
 const app = express();
-app.use(express.json());
+app.use(express.json({ limit: "25mb" }));
 
 app.get("/", (_, res) => res.sendStatus(httpStatus.OK));
 
