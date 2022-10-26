@@ -53,7 +53,7 @@ describe("Check interop ECDSA routes", () => {
       iothub.Registry.fromConnectionString = jest
         .fn()
         .mockImplementation(() => ({
-          create: jest.fn().mockResolvedValue("test"),
+          addDevices: jest.fn().mockResolvedValue({errors:[]}),
         }));
       iothub.ConnectionString.parse = jest
         .fn()
@@ -118,7 +118,7 @@ describe("Check interop ECDSA routes", () => {
       iothub.Registry.fromConnectionString = jest
         .fn()
         .mockImplementation(() => ({
-          create: jest.fn().mockResolvedValue("test"),
+          addDevices: jest.fn().mockResolvedValue({errors:[]}),
         }));
       iothub.ConnectionString.parse = jest.fn().mockImplementation(() => {
         throw new Error("test");
@@ -156,7 +156,7 @@ describe("Check interop ECDSA routes", () => {
       iothub.Registry.fromConnectionString = jest
         .fn()
         .mockImplementation(() => ({
-          create: jest.fn().mockImplementation(() => {
+          addDevices: jest.fn().mockImplementation(() => {
             throw new Error("test");
           }),
         }));
@@ -194,7 +194,7 @@ describe("Check interop ECDSA routes", () => {
       iothub.Registry.fromConnectionString = jest
         .fn()
         .mockImplementation(() => ({
-          create: jest.fn().mockResolvedValue("test"),
+          addDevices: jest.fn().mockResolvedValue({errors:[]}),
         }));
       iothub.ConnectionString.parse = jest
         .fn()
@@ -223,16 +223,16 @@ describe("Check interop ECDSA routes", () => {
       expect(res.statusCode).toEqual(httpStatus.OK);
       expect(res.body).toEqual([
         {
+          ref: "b",
+          status: "ERROR",
+          message: "Cannot decode certitifcate",
+        },
+        {
           ref: "a",
           status: "SUCCESS",
           endpoint: "local-mocked",
           topic: "iqs",
           policyApplied: true,
-        },
-        {
-          ref: "b",
-          status: "ERROR",
-          message: "Cannot decode certitifcate",
         },
       ]);
     });

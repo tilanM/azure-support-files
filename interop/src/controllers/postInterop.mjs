@@ -1,6 +1,5 @@
 import Joi from "joi";
 import iothub from "azure-iothub";
-import iotcommon from "azure-iot-common";
 
 import requestMiddleware from "../middleware/request.mjs";
 import {
@@ -10,6 +9,9 @@ import {
   isValidExpiration,
 } from "../helpers/crypto.mjs";
 import { baseTopic } from "../vars.mjs";
+
+// https://learn.microsoft.com/en-us/azure/iot-hub/troubleshoot-error-codes#409001
+const codeAlreadyExists = 409001;
 
 const postInteropSchema = Joi.object().keys({
   action: Joi.string().valid("status", "provision", "message").required(),
@@ -76,6 +78,10 @@ async function provision(certs) {
 
   const policy = true;
 
+  let deviceDetails = [];
+  let deviceRefMap = new Map();
+  let resMap = new Map();
+
   for (const item of certs) {
     let certBuf;
     let cert;
@@ -86,7 +92,7 @@ async function provision(certs) {
       certBuf = Buffer.from(item.cert, "base64");
       cert = await getCertificate(certBuf);
     } catch (err) {
-      resp.push({
+      resMap.set(item.ref, {
         ref: item.ref,
         status: "ERROR",
         message: "Cannot decode certitifcate",
@@ -97,8 +103,7 @@ async function provision(certs) {
     try {
       serialNumber = await getSerialNumber(cert);
     } catch (err) {
-      console.log("errserial:", err);
-      resp.push({
+      resMap.set(item.ref, {
         ref: item.ref,
         status: "ERROR",
         message:
@@ -111,7 +116,7 @@ async function provision(certs) {
       const isValid = await isValidExpiration(cert);
 
       if (!isValid) {
-        resp.push({
+        resMap.set(item.ref, {
           ref: item.ref,
           status: "ERROR",
           message: "Certificate notBefore or notAfter is out of range",
@@ -119,8 +124,7 @@ async function provision(certs) {
         continue;
       }
     } catch (err) {
-      console.log("errexpiration:", err);
-      resp.push({
+      resMap.set(item.ref, {
         ref: item.ref,
         status: "ERROR",
         message: "Certificate expiration cannot be decoded",
@@ -128,19 +132,11 @@ async function provision(certs) {
       continue;
     }
 
-    // try{
-    //   const getDevInfo = util.promisify(registry.get);
-    //   const a = await getDevInfo(serialNumber);
-    //   console.log('e1', a);
-    // }
-    // catch(err)
-    // {
-    //   console.log('e2', err);
-    // }
-
     try {
       thumbprint = await getThumbprint(cert);
-      await registry.create({
+
+      deviceRefMap.set(serialNumber, item.ref);
+      deviceDetails.push({
         deviceId: serialNumber,
         status: "enabled",
         authentication: {
@@ -150,33 +146,70 @@ async function provision(certs) {
           },
         },
       });
-
-      resp.push({
-        ref: item.ref,
-        status: "SUCCESS",
-        endpoint: endpoint,
-        topic: baseTopic,
-        policyApplied: policy,
-      });
     } catch (err) {
-      if (err instanceof iotcommon.errors.DeviceAlreadyExistsError) {
-        resp.push({
-          ref: item.ref,
-          status: "SUCCESS",
-          endpoint: endpoint,
-          topic: baseTopic,
-          policyApplied: policy,
-        });
-      } else {
-        resp.push({
-          ref: item.ref,
+      resMap.set(item.ref, {
+        ref: item.ref,
+        status: "ERROR",
+        message: "Cannot get thumbprint",
+      });
+
+      continue;
+    }
+  }
+
+  while (deviceDetails.length > 0) {
+    let batch = deviceDetails.splice(0, 100);
+    let resAdd;
+    try {
+      resAdd = await registry.addDevices(batch);
+    } catch (err) {
+      let body;
+      try {
+        body = JSON.parse(err?.responseBody);
+      } catch (err) {
+        body = null;
+      }
+      resAdd = body;
+    }
+
+    if (resAdd) {
+      if (resAdd?.errors?.length > 0) {
+        for (const row of resAdd.errors) {
+          if (row.errorCode == codeAlreadyExists) continue;
+          const ref = deviceRefMap.get(row.deviceId);
+          resMap.set(ref, {
+            ref: ref,
+            status: "ERROR",
+            message: "Failed creating and registering thing",
+          });
+        }
+      }
+
+      for (const row of batch) {
+        const ref = deviceRefMap.get(row.deviceId);
+        if (!resMap.has(ref)) {
+          resMap.set(ref, {
+            ref: ref,
+            status: "SUCCESS",
+            endpoint: endpoint,
+            topic: baseTopic,
+            policyApplied: policy,
+          });
+        }
+      }
+    } else {
+      for (const row of batch) {
+        const ref = deviceRefMap.get(row.deviceId);
+        resMap.set(ref, {
+          ref: ref,
           status: "ERROR",
           message: "Failed creating and registering thing",
         });
       }
-      continue;
     }
   }
+
+  if (resMap.size > 0) resp = Array.from(resMap.values());
 
   return resp;
 }
