@@ -8,13 +8,13 @@ import {
   getThumbprint,
   isValidExpiration,
 } from "../helpers/crypto.mjs";
-import { baseTopic } from "../vars.mjs";
+import { baseTopic, compatibilityVersion } from "../vars.mjs";
 
 // https://learn.microsoft.com/en-us/azure/iot-hub/troubleshoot-error-codes#409001
 const codeAlreadyExists = 409001;
 
 const postInteropSchema = Joi.object().keys({
-  action: Joi.string().valid("status", "provision", "message").required(),
+  action: Joi.string().valid("status", "provision", "message", "info").required(),
   certs: Joi.when("action", {
     is: "provision",
     then: Joi.array().items(
@@ -45,9 +45,20 @@ async function post(req, res, next) {
       resp = await status();
       break;
     }
+    case "info": {
+      resp = await info();
+      break;
+    }
   }
 
   res.send(resp);
+}
+
+async function info(){
+  return {
+    action:"info",
+    compatibilityVersion
+  }
 }
 
 async function status() {

@@ -6,7 +6,7 @@ import fs from "fs";
 import { app } from "../src/app.mjs";
 import { genToken } from "./helpers/genToken.mjs";
 
-import { publicKeyURL } from "../src/vars.mjs";
+import { publicKeyURL, compatibilityVersion } from "../src/vars.mjs";
 
 const mocker = HttpRequestMock.setup();
 
@@ -97,6 +97,23 @@ describe("Check interop routes", () => {
       expect(res.body).toEqual({
         message: "Not yet implemented.",
         action: "message",
+      });
+    });
+    test(`should return ${httpStatus.OK} with info action`, async () => {
+      const token = await genToken();
+      const body = {
+        action: "info",
+      };
+
+      const res = await request(app)
+        .post("/interop")
+        .set("Authorization", token)
+        .send(body);
+
+      expect(res.statusCode).toEqual(httpStatus.OK);
+      expect(res.body).toEqual({
+        compatibilityVersion,
+        action: "info",
       });
     });
   });

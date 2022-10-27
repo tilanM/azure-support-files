@@ -13,6 +13,8 @@ const baseTopic = process.env.DEFAULT_TOPIC || "iqs";
 
 const thingNamePrefix = process.env.THING_PREFIX || "Infineon_";
 
+const compatibilityVersion = 1;
+
 export {
   verifyCacheKey,
   isLocal,
@@ -21,4 +23,5 @@ export {
   iotPolicy,
   baseTopic,
   thingNamePrefix,
+  compatibilityVersion
 };
