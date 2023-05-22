@@ -15,7 +15,7 @@
     "azure-iothub": "^1.15.1",
     "cache-manager": "^5.1.1",
     "express": "^4.18.2",
-    "fast-jwt": "^2.0.0",
+    "fast-jwt": "^3.0.0",
     "got": "^12.5.2",
     "http-status": "^1.5.3",
     "joi": "^17.6.3",
