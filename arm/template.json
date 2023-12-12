@@ -106,16 +106,8 @@
               "value": "1"
             },
             {
-              "name": "IOT_CONN",
-              "value": "[concat('HostName=', reference(resourceId('Microsoft.Devices/IoTHubs', variables('iotHubName')), providers('Microsoft.Devices', 'IoTHubs').apiVersions[0]).hostName, ';SharedAccessKeyName=iothubowner;SharedAccessKey=', listKeys(resourceId('Microsoft.Devices/IotHubs', variables('iotHubName')), providers('Microsoft.Devices', 'IoTHubs').apiVersions[0]).value[0].primaryKey)]"
-            },
-            {
               "name": "AUDIENCE",
               "value": "[subscription().subscriptionId]"
-            },
-            {
-              "name": "STORAGE_CON_STRING",
-              "value": "[concat('DefaultEndpointsProtocol=https;AccountName=', variables('storageAccountName'), ';EndpointSuffix=', environment().suffixes.storage, ';AccountKey=', listKeys(resourceId('Microsoft.Storage/storageAccounts', variables('storageAccountName')), '2019-06-01').keys[0].value)]"
             }
           ]
         }
@@ -132,9 +124,7 @@
       "properties": {
         "packageUri": "https://raw.githubusercontent.com/tilanM/azure-support-files/master/releases/interop.zip"
       }
-    }, 
-
-    
+    },
     {
       "type": "Microsoft.Web/serverfarms",
       "apiVersion": "2021-02-01",
@@ -200,14 +190,6 @@
             {
               "name": "IOT_CONN",
               "value": "[concat('HostName=', reference(resourceId('Microsoft.Devices/IoTHubs', variables('iotHubName')), providers('Microsoft.Devices', 'IoTHubs').apiVersions[0]).hostName, ';SharedAccessKeyName=iothubowner;SharedAccessKey=', listKeys(resourceId('Microsoft.Devices/IotHubs', variables('iotHubName')), providers('Microsoft.Devices', 'IoTHubs').apiVersions[0]).value[0].primaryKey)]"
-            },
-            {
-              "name": "AUDIENCE",
-              "value": "[subscription().subscriptionId]"
-            },
-            {
-              "name": "STORAGE_CON_STRING",
-              "value": "[concat('DefaultEndpointsProtocol=https;AccountName=', variables('storageAccountName'), ';EndpointSuffix=', environment().suffixes.storage, ';AccountKey=', listKeys(resourceId('Microsoft.Storage/storageAccounts', variables('storageAccountName')), '2019-06-01').keys[0].value)]"
             }
           ]
         }
@@ -222,12 +204,10 @@
         "[resourceId('Microsoft.Web/sites/', variables('functionAppNameForTrigger'))]"
       ],
       "properties": {
-        "packageUri": "https://raw.githubusercontent.com/tilanM/azure-support-files/master/releases/blobTrigger.zip"
+        "packageUri": "https://raw.githubusercontent.com/tilanM/azure-support-files/master/releases/storage-trigger.zip"
       }
     }
   ],
-
-
   "outputs": {
     "interopURL": {
       "type": "String",
@@ -236,10 +216,6 @@
     "subscriptionId": {
       "type": "String",
       "value": "[subscription().subscriptionId]"
-    },
-    "IOT_CONN": {
-      "type": "String",
-      "value": "[concat('HostName=', reference(resourceId('Microsoft.Devices/IoTHubs', variables('iotHubName')), providers('Microsoft.Devices', 'IoTHubs').apiVersions[0]).hostName, ';SharedAccessKeyName=iothubowner;SharedAccessKey=', listKeys(resourceId('Microsoft.Devices/IotHubs', variables('iotHubName')), providers('Microsoft.Devices', 'IoTHubs').apiVersions[0]).value[0].primaryKey)]"
     }
   }
 }

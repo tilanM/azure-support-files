@@ -15,6 +15,10 @@ const thingNamePrefix = process.env.THING_PREFIX || "Infineon_";
 
 const compatibilityVersion = 1;
 
+const storageConnectionString = process.env.AzureWebJobsStorage || "test-con-string";
+
+const containerName = "cert-store";
+
 export {
   verifyCacheKey,
   isLocal,
@@ -23,5 +27,7 @@ export {
   iotPolicy,
   baseTopic,
   thingNamePrefix,
-  compatibilityVersion
+  compatibilityVersion,
+  storageConnectionString,
+  containerName,
 };

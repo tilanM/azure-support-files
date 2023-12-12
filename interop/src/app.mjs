@@ -12,7 +12,7 @@ app.get("/", (_, res) => res.sendStatus(httpStatus.OK));
 
 app.get("/auth", authMiddleware, (_, res) => res.sendStatus(httpStatus.OK));
 
-app.use("/interop", authMiddleware, interop);
+app.use("/interop", interop);
 
 app.use((err, _, res, next) => {
   if (res.headersSent) {
@@ -23,6 +23,12 @@ app.use((err, _, res, next) => {
     error: err.message,
   });
 });
+
+// const PORT = 3000;
+
+// app.listen(PORT, () => {
+//   console.log(`Server is running on http://localhost:${PORT}`);
+// });
 
 const handler = serverlessHttp(app, { provider: "azure" });
 

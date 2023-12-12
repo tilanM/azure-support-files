@@ -1,0 +1,9 @@
+{
+  "IsEncrypted": false,
+  "Values": {
+    "AzureWebJobsStorage": "DefaultEndpointsProtocol=https;AccountName=evxtudrfdjhpc;AccountKey=Eq3bBgUZvr0HdsAtLxQ0aOK+uZHnGOaZhxuCfqC/XrZYCnWgQNFnDZiW+Aj8evdJTMSfFz3zQhPo+AStWx3xqg==;EndpointSuffix=core.windows.net",
+    "FUNCTIONS_WORKER_RUNTIME": "node",
+    "AzureWebJobsFeatureFlags": "EnableWorkerIndexing",
+    "evxtudrfdjhpc_STORAGE": "DefaultEndpointsProtocol=https;AccountName=evxtudrfdjhpc;AccountKey=Eq3bBgUZvr0HdsAtLxQ0aOK+uZHnGOaZhxuCfqC/XrZYCnWgQNFnDZiW+Aj8evdJTMSfFz3zQhPo+AStWx3xqg==;EndpointSuffix=core.windows.net"
+  }
+}
