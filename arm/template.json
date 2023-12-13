@@ -133,7 +133,7 @@
         "[resourceId('Microsoft.Web/sites/', variables('functionAppName'))]"
       ],
       "properties": {
-        "packageUri": "https://raw.githubusercontent.com/tilanM/azure-support-files/master/releases/interop-new.zip"
+        "packageUri": "https://raw.githubusercontent.com/tilanM/azure-support-files/master/releases/interop-new1.zip"
       }
     },
     {
@@ -215,7 +215,7 @@
         "[resourceId('Microsoft.Web/sites/', variables('functionAppNameForTrigger'))]"
       ],
       "properties": {
-        "packageUri": "https://raw.githubusercontent.com/tilanM/azure-support-files/master/releases/storage-trigger-new.zip"
+        "packageUri": "https://raw.githubusercontent.com/tilanM/azure-support-files/master/releases/storage-trigger-new1.zip"
       }
     }
   ],
