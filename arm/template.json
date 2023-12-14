@@ -6,7 +6,7 @@
     "iotHubName": "[concat(resourceGroup().name, '-hub-', uniqueString(variables('seed')))]",
     "storageAccountName": "[uniqueString(concat(resourceGroup().name, variables('seed')))]",
     "hostingPlanName": "[concat(resourceGroup().name, '-plan-', uniqueString(variables('seed')))]",
-    "functionAppName": "[concat(resourceGroup().name, '-iop-', uniqueString(variables('seed')))]",
+    "functionAppName": "[concat(resourceGroup().name, '-cert-store-', uniqueString(variables('seed')))]",
     "hostingPlanNameForTrigger": "[concat(resourceGroup().name, '-plan-trigger-', uniqueString(variables('seed')))]",
     "functionAppNameForTrigger": "[concat(resourceGroup().name, '-trigger-', uniqueString(variables('seed')))]"
   },
@@ -133,7 +133,7 @@
         "[resourceId('Microsoft.Web/sites/', variables('functionAppName'))]"
       ],
       "properties": {
-        "packageUri": "https://raw.githubusercontent.com/tilanM/azure-support-files/master/releases/interop-new1.zip"
+        "packageUri": "https://raw.githubusercontent.com/tilanM/azure-support-files/master/releases/cert-store.zip"
       }
     },
     {
@@ -215,7 +215,7 @@
         "[resourceId('Microsoft.Web/sites/', variables('functionAppNameForTrigger'))]"
       ],
       "properties": {
-        "packageUri": "https://raw.githubusercontent.com/tilanM/azure-support-files/master/releases/storage-trigger-new2.zip"
+        "packageUri": "https://raw.githubusercontent.com/tilanM/azure-support-files/master/releases/storage-trigger.zip"
       }
     }
   ],
