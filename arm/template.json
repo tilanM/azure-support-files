@@ -227,7 +227,7 @@
         "[resourceId('Microsoft.Web/sites/', variables('functionAppNameForTrigger'))]"
       ],
       "properties": {
-        "packageUri": "https://raw.githubusercontent.com/tilanM/azure-support-files/master/releases/az-queue.zip"
+        "packageUri": "https://raw.githubusercontent.com/tilanM/azure-support-files/master/releases/az-queue2.zip"
       }
     }
   ],
