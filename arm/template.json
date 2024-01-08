@@ -148,7 +148,7 @@
         "[resourceId('Microsoft.Web/sites/', variables('certStoreFunctionAppName'))]"
       ],
       "properties": {
-        "packageUri": "https://raw.githubusercontent.com/tilanM/azure-support-files/master/releases/az-cert-store1.zip"
+        "packageUri": "https://raw.githubusercontent.com/tilanM/azure-support-files/master/releases/az-cert-store.zip"
       }
     },
     {
@@ -246,7 +246,7 @@
         "[resourceId('Microsoft.Web/sites/', variables('queueFunctionAppName'))]"
       ],
       "properties": {
-        "packageUri": "https://raw.githubusercontent.com/tilanM/azure-support-files/master/releases/az-queue11.zip"
+        "packageUri": "https://raw.githubusercontent.com/tilanM/azure-support-files/master/releases/az-queue.zip"
       }
     }
   ],
