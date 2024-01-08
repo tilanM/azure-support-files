@@ -123,6 +123,14 @@
             {
               "name": "queueName",
               "value": "iot-dev-registering-queue"
+            },
+            {
+              "name": "certContainerName",
+              "value": "cert-store"
+            },
+            {
+              "name": "logContainerName",
+              "value": "cert-logs"
             }
           ]
         }
@@ -213,6 +221,14 @@
             {
               "name": "queueName",
               "value": "iot-dev-registering-queue"
+            },
+            {
+              "name": "certContainerName",
+              "value": "cert-store"
+            },
+            {
+              "name": "logContainerName",
+              "value": "cert-logs"
             }
           ]
         }
@@ -227,7 +243,7 @@
         "[resourceId('Microsoft.Web/sites/', variables('functionAppNameForTrigger'))]"
       ],
       "properties": {
-        "packageUri": "https://raw.githubusercontent.com/tilanM/azure-support-files/master/releases/az-queue7.zip"
+        "packageUri": "https://raw.githubusercontent.com/tilanM/azure-support-files/master/releases/az-queue8.zip"
       }
     }
   ],
