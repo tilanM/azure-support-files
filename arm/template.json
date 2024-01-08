@@ -246,7 +246,7 @@
         "[resourceId('Microsoft.Web/sites/', variables('queueFunctionAppName'))]"
       ],
       "properties": {
-        "packageUri": "https://raw.githubusercontent.com/tilanM/azure-support-files/master/releases/az-queue10.zip"
+        "packageUri": "https://raw.githubusercontent.com/tilanM/azure-support-files/master/releases/az-queue11.zip"
       }
     }
   ],
