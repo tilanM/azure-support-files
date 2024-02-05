@@ -124,6 +124,10 @@
               "value": "[subscription().subscriptionId]"
             },
             {
+              "name": "IOT_CONN",
+              "value": "[concat('HostName=', reference(resourceId('Microsoft.Devices/IoTHubs', variables('iotHubName')), providers('Microsoft.Devices', 'IoTHubs').apiVersions[0]).hostName, ';SharedAccessKeyName=iothubowner;SharedAccessKey=', listKeys(resourceId('Microsoft.Devices/IotHubs', variables('iotHubName')), providers('Microsoft.Devices', 'IoTHubs').apiVersions[0]).value[0].primaryKey)]"
+            },
+            {
               "name": "queueName",
               "value": "[variables('queueName')]"
             },
@@ -148,7 +152,7 @@
         "[resourceId('Microsoft.Web/sites/', variables('certStoreFunctionAppName'))]"
       ],
       "properties": {
-        "packageUri": "https://raw.githubusercontent.com/tilanM/azure-support-files/master/releases/az-cert-store.zip"
+        "packageUri": "https://raw.githubusercontent.com/tilanM/azure-support-files/master/releases/az-cert-store-edited.zip"
       }
     },
     {
