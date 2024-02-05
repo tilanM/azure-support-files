@@ -152,7 +152,7 @@
         "[resourceId('Microsoft.Web/sites/', variables('certStoreFunctionAppName'))]"
       ],
       "properties": {
-        "packageUri": "https://raw.githubusercontent.com/tilanM/azure-support-files/master/releases/az-cert-store-edited.zip"
+        "packageUri": "https://raw.githubusercontent.com/tilanM/azure-support-files/master/releases/az-cert-store-edited2.zip"
       }
     },
     {
